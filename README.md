@@ -1,5 +1,5 @@
 # niteshsinha.com
-My Html Css Website
+Simple Flask based website
 
 Url : http://niteshsinha.com
 
