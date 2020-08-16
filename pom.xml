@@ -1,0 +1,247 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>2.3.1.RELEASE</version>
+	</parent>
+
+	<groupId>com.niteshsinha</groupId>
+	<artifactId>candid</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<name>candid</name>
+	<packaging>pom</packaging>
+	<description>Candid - Project for learning Reactive Postgres</description>
+
+	<profiles>
+		<profile>
+			<id>all</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+			<modules>
+				<module>model</module>
+				<module>service</module>
+			</modules>
+		</profile>
+		<profile>
+			<id>functionalTests</id>
+			<modules>
+				<module>model</module>
+				<module>service</module>
+			</modules>
+		</profile>
+	</profiles>
+
+	<properties>
+		<java.version>1.8</java.version>
+		<spring.version>2.3.1.RELEASE</spring.version>
+		<grpc.version>1.3.0</grpc.version>
+		<parent.target>${project.basedir}/../target</parent.target>
+		<jacoco.reportPath>${project.basedir}/../target/jacoco.exec</jacoco.reportPath>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<keyvalueservice.version>1.123.0</keyvalueservice.version>
+		<skipITs>false</skipITs>
+		<test.groups>!SystemTest</test.groups>
+		<maven-failsafe-plugin.version>2.22.2</maven-failsafe-plugin.version>
+		<maven-surefire-plugin.version>2.22.2</maven-surefire-plugin.version>
+		<jacoco-maven-plugin.version>0.8.5</jacoco-maven-plugin.version>
+	</properties>
+
+	<dependencies>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-r2dbc</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-webflux</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>io.r2dbc</groupId>
+			<artifactId>r2dbc-postgresql</artifactId>
+			<version>0.8.4.RELEASE</version>
+		</dependency>
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+			<optional>true</optional>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+			<exclusions>
+				<exclusion>
+					<groupId>org.junit.vintage</groupId>
+					<artifactId>junit-vintage-engine</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>io.projectreactor</groupId>
+			<artifactId>reactor-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<artifactId>maven-resources-plugin</artifactId>
+					<version>3.0.2</version>
+					<executions>
+						<execution>
+							<id>copy-classes</id>
+							<phase>package</phase>
+							<goals>
+								<goal>copy-resources</goal>
+							</goals>
+							<configuration>
+								<outputDirectory>${parent.target}/classes</outputDirectory>
+								<resources>
+									<resource>
+										<directory>${basedir}/target/classes</directory>
+										<filtering>false</filtering>
+									</resource>
+								</resources>
+							</configuration>
+						</execution>
+						<execution>
+							<id>copy-unit-tests-results</id>
+							<phase>test</phase>
+							<goals>
+								<goal>copy-resources</goal>
+							</goals>
+							<configuration>
+								<outputDirectory>${parent.target}/surefire-reports</outputDirectory>
+								<resources>
+									<resource>
+										<directory>${basedir}/target/surefire-reports</directory>
+										<filtering>false</filtering>
+									</resource>
+								</resources>
+							</configuration>
+						</execution>
+					</executions>
+				</plugin>
+				<plugin>
+					<groupId>org.springframework.boot</groupId>
+					<artifactId>spring-boot-maven-plugin</artifactId>
+					<version>${spring.version}</version>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-surefire-plugin</artifactId>
+					<version>${maven-surefire-plugin.version}</version>
+					<configuration>
+						<groups>${test.groups}</groups>
+					</configuration>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-failsafe-plugin</artifactId>
+					<version>${maven-failsafe-plugin.version}</version>
+				</plugin>
+			</plugins>
+		</pluginManagement>
+
+
+		<plugins>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-deploy-plugin</artifactId>
+				<version>2.8.2</version>
+				<configuration>
+					<skip>false</skip>
+				</configuration>
+			</plugin>
+
+
+			<plugin>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.6.1</version>
+				<configuration>
+					<source>1.8</source>
+					<target>1.8</target>
+				</configuration>
+			</plugin>
+
+
+			<plugin>
+				<groupId>org.jacoco</groupId>
+				<artifactId>jacoco-maven-plugin</artifactId>
+				<version>${jacoco-maven-plugin.version}</version>
+				<executions>
+					<execution>
+						<id>agent-for-ut</id>
+						<goals>
+							<goal>prepare-agent</goal>
+						</goals>
+						<configuration>
+							<append>true</append>
+							<destFile>${jacoco.reportPath}</destFile>
+						</configuration>
+					</execution>
+				</executions>
+				<configuration>
+					<includes>
+						<include>com/niteshsinha/**/*</include>
+					</includes>
+					<excludes>
+						<exclude>com/niteshsinha/**/*model/**</exclude>
+					</excludes>
+				</configuration>
+			</plugin>
+
+
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-pmd-plugin</artifactId>
+				<version>3.8</version>
+				<configuration>
+					<aggregate>true</aggregate>
+					<excludeRoots>
+						<excludeRoot>target/generated-sources</excludeRoot>
+					</excludeRoots>
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>build-helper-maven-plugin</artifactId>
+				<version>3.0.0</version>
+
+				<executions>
+					<execution>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>add-source</goal>
+						</goals>
+						<configuration>
+							<sources>
+								<source>src/main/kotlin</source>
+							</sources>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+
+	<scm>
+		<developerConnection>scm:git:https://github.com/niteshsinha/niteshsinha.com.git
+		</developerConnection>
+		<tag>HEAD</tag>
+	</scm>
+
+</project>

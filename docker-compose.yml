@@ -1,0 +1,15 @@
+version: '2.1'
+
+services:
+  postgres:
+    image: "postgres:11.5"
+    hostname: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./init-db:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: "pg_isready -h localhost -p 5432 -q -U postgres"
+      interval: 5s
+      timeout: 30s
+      retries: 5
