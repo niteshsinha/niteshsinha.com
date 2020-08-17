@@ -1,34 +1,39 @@
 package com.niteshsinha.candid.service;
 
+import com.niteshsinha.candid.model.Candid;
+import com.niteshsinha.candid.repository.CandidRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.r2dbc.core.DatabaseClient;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 @Slf4j
-@Service
+@RestController
 public class CandidService {
 
-    private final DatabaseClient databaseClient;
+    private final CandidRepository candidRepository;
     private final CandidClient candidClient;
 
     @Autowired
-    public CandidService(DatabaseClient databaseClient, CandidClient candidClient) {
-        this.databaseClient = databaseClient;
+    public CandidService(CandidRepository candidRepository, CandidClient candidClient) {
+        this.candidRepository = candidRepository;
         this.candidClient = candidClient;
     }
 
-    @Scheduled(
-            fixedDelayString = "#{${cynic.statusalertsite.poll.interval.seconds:30}*1000}", // 10 mins
-            initialDelayString = "#{${cynic.statusalertsite.poll.initial.delay.seconds:120}*1000}" //2 min
-    )
-    public void serve() {
-        log.info("Polling for Updates from alertsite");
-        pollAlertsite();
+    @PostMapping("/candid/add")
+    public Mono<Candid> add(@RequestBody Candid candid) {
+        return candidRepository.save(candid);
     }
 
-    private void pollAlertsite() {
-        candidClient.getData();
+    @GetMapping("/candid/list")
+    public Flux<Candid> get() {
+        return candidRepository.findAll();
     }
 }

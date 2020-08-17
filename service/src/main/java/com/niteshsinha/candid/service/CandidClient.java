@@ -20,7 +20,7 @@ public class CandidClient {
         String temp = "C38973?start_date=2020-04-22+10:12:41&end_date=2020-04-26+12:53:31&devices=249861,249863,249865,337506,337510&locations=&api_version=2&format=json";
         String block = webClient.get()
                 .uri(temp)
-                .headers(httpHeaders -> httpHeaders.setBasicAuth("staraa@symantec.com","<hidden>")) //password not working anymore - 401 error
+                .headers(httpHeaders -> httpHeaders.setBasicAuth("<hidden>","<hidden>")) //password not working anymore - 401 error
                 .retrieve()
                 .bodyToMono(String.class)
                 .log()

@@ -16,24 +16,24 @@ import org.springframework.web.reactive.function.client.WebClient;
 @EnableR2dbcRepositories
 public class CandidConfig extends AbstractR2dbcConfiguration {
 
-    private final String alertSiteHost;
-    private final String alertsiteDbHost;
-    private final String alertsiteDbUsername;
-    private final String alertsiteDbPassword;
-    private final String alertsiteDbname;
+    private final String candidHost;
+    private final String candidDbHost;
+    private final String candidDbUsername;
+    private final String candidDbPassword;
+    private final String candidDbName;
 
     public CandidConfig(
-            @Value("${cynic.statusalertsite.url}") String url,
-            @Value("${cynic.statusalertsite.db.host:localhost}") String dbHost,
-            @Value("${cynic.statusalertsite.db.username:postgres}") String dbUsername,
-            @Value("${cynic.statusalertsite.db.password:postgres}") String dbPassword,
-            @Value("${cynic.statusalertsite.db.name:pod_check}") String dbName
+            @Value("${cynic.statusalertsite.url:myurl}") String url,
+            @Value("${com.niteshsinha.candid.db.host:localhost}") String dbHost,
+            @Value("${com.niteshsinha.candid.db.username:postgres}") String dbUsername,
+            @Value("${com.niteshsinha.candid.db.password:postgres}") String dbPassword,
+            @Value("${com.niteshsinha.candid.db.name:pod_check}") String dbName
     ) {
-        this.alertsiteDbHost = dbHost;
-        this.alertsiteDbname = dbName;
-        this.alertsiteDbPassword = dbPassword;
-        this.alertsiteDbUsername = dbUsername;
-        this.alertSiteHost = url;
+        this.candidDbHost = dbHost;
+        this.candidDbName = dbName;
+        this.candidDbPassword = dbPassword;
+        this.candidDbUsername = dbUsername;
+        this.candidHost = url;
 
     }
 
@@ -43,11 +43,11 @@ public class CandidConfig extends AbstractR2dbcConfiguration {
     public ConnectionFactory connectionFactory() {
         return new PostgresqlConnectionFactory(
                 PostgresqlConnectionConfiguration.builder()
-                        .host(alertsiteDbHost)
+                        .host(candidDbHost)
                         .port(5432)
-                        .username(alertsiteDbUsername)
-                        .password(alertsiteDbPassword)
-                        .database(alertsiteDbname)
+                        .username(candidDbUsername)
+                        .password(candidDbPassword)
+                        .database(candidDbName)
                         .build()
         );
     }
@@ -62,7 +62,7 @@ public class CandidConfig extends AbstractR2dbcConfiguration {
     @Bean
     public WebClient webClient() {
         return WebClient.builder()
-                .baseUrl(alertSiteHost)
+                .baseUrl(candidHost)
                 .exchangeStrategies(ExchangeStrategies.builder()
                         .codecs(clientCodecConfigurer -> clientCodecConfigurer.defaultCodecs().maxInMemorySize(-1))
                         .build())
